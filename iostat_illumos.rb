@@ -50,7 +50,7 @@ INTERVAL = ENV['COLLECTD_INTERVAL'] ? ENV['COLLECTD_INTERVAL'].to_i : 10
 
 while true
     pools = getPools
-    @iostatProcess = IO.popen("iostat -xn 1 1")
+    @iostatProcess = IO.popen("iostat -xn 1")
     while line = @iostatProcess.gets do
         if  ( line =~ /device/ )
             #puts "Debug: Skipped line:" + line
