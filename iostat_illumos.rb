@@ -8,7 +8,7 @@
 # For the full copyright and license information, please view the LICENSE
 # file that was distributed with this source code.
 #
-# This is a collectd plugin that calls iostat infinately at the interval specified in collectd.conf.
+# This is a Collectd plugin that calls iostat infinately at the interval specified in collectd.conf.
 # It requires the exec Collectd plugin so it can be executed by Collectd.
 # Only one process is loaded, at the begining, when collectd starts.
 # Collectd will read the process' output periodically.
@@ -34,8 +34,8 @@ def killChildAndExit
     abort("Caught TERM. Exiting...")
 end
 
-def sendToCollectd(device,type,path,metric,value)
-    puts "PUTVAL " + HOSTNAME.chomp + "/iostat-" + type + "-" + device + "/gauge-" + path + "_" +  metric + " interval=" + INTERVAL.to_s + " N:" + value.to_s
+def sendToCollectd(device,type,metric,value)
+    puts "PUTVAL " + HOSTNAME.chomp + "/iostat-" + type + "-" + device + "/gauge-" + metric + " interval=" + INTERVAL.to_s + " N:" + value.to_s
 end
 
 def getPools
@@ -57,16 +57,16 @@ while true
         else
             iops_read, iops_write, kb_read, kb_write, wait, actv, wsvc_t, asvc_t, perc_wait, perc_busy, device = line.split
             type = pools.include?(device + "\n") ? "pool" : "disk"
-            sendToCollectd device, type, "iops", "read", iops_read
-            sendToCollectd device, type, "iops", "write", iops_write
-            sendToCollectd device, type, "bandwidth", "read", kb_read.to_i*1024
-            sendToCollectd device, type, "bandwidth", "write", kb_write.to_i*1024
-            sendToCollectd device, type, "wait", "transactions", wait
-            sendToCollectd device, type, "active", "transactions", actv
-            sendToCollectd device, type, "wait", "time", wsvc_t
-            sendToCollectd device, type, "active", "service_time", asvc_t
-            sendToCollectd device, type, "wait", "percent", perc_wait
-            sendToCollectd device, type, "active", "percent", perc_busy
+            sendToCollectd device, type, "iops_read-rs", iops_read
+            sendToCollectd device, type, "iops_write-ws", iops_write
+            sendToCollectd device, type, "bandwidth_read-krs", kb_read.to_i*1024
+            sendToCollectd device, type, "bandwidth_write-kws", kb_write.to_i*1024
+            sendToCollectd device, type, "wait_transactions-wait", wait
+            sendToCollectd device, type, "active_transactions-actv", actv
+            sendToCollectd device, type, "wait_avg_service_time-wsvc_t", wsvc_t
+            sendToCollectd device, type, "active_avg_service_time-asvc_t", asvc_t
+            sendToCollectd device, type, "wait_percent-w", perc_wait
+            sendToCollectd device, type, "active_percent-b", perc_busy
         end
     end
     @iostatProcess.close
