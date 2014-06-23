@@ -21,9 +21,9 @@ install-collectd-plugins:
 	rm -rf $(INSTALL_DIR)
 	mkdir -p $(INSTALL_DIR)
 	ginstall -d -m 777 -o admin -g staff $(INSTALL_DIR)/$(PREFIX)/collectd-plugins
-	cp -a *.rb $(INSTALL_DIR)/$(PREFIX)/collectd-plugins/
-	cp -a *.d $(INSTALL_DIR)/$(PREFIX)/collectd-plugins/
-	cp -a *.sh $(INSTALL_DIR)/$(PREFIX)/collectd-plugins/
+	ginstall -m 755 -o root -g root *.rb $(INSTALL_DIR)/$(PREFIX)/collectd-plugins/
+	ginstall -m 755 -o root -g root *.d $(INSTALL_DIR)/$(PREFIX)/collectd-plugins/
+	ginstall -m 755 -o root -g root *.sh $(INSTALL_DIR)/$(PREFIX)/collectd-plugins/
 
 clean:
 	rm -rf $(BUILD_DIR)
