@@ -9,11 +9,10 @@
 # For the full copyright and license information, please view the LICENSE
 # file that was distributed with this source code.
 #
-# This is a Collectd plugin written as a dtrace script. It collects IOPS, bandwidth, and average blocksize information
-# about all datasets on the system. It will, however, output only a shortened version of the path for each dataset.
-# The output format is: <pool_name>_<parent_folder>_<dataset>
+# This is a Collectd plugin written as a dtrace script. It collects IOPS and transfer rate for fiber channel.
+# The output format is: remote_initiator_name
 # This script can not be directly run by collectd.
-# See zfs_iostat.sh for details about running it.
+# See fc_iostat.sh for details about running it.
 # It requires the exec Collectd plugin so it can be executed by Collectd.
 # Only one process is loaded, at the beginning, when collectd starts.
 # Collectd will read the process' output periodically.
@@ -24,10 +23,10 @@
 # For information about Collectd's plain text protocol, see
 # https://collectd.org/wiki/index.php/Plain_text_protocol
 #
-# The plugin must not run as root. "nobody" is a good candidate but feel free to use your favorit user.
+# The plugin must not run as root. "nobody" is a good candidate but feel free to use your favorite user.
 #
 # <Plugin exec>
-#    Exec "someone_who_can_sudo" "/path/to/zfs_iostat.sh"
+#    Exec "someone_who_can_sudo" "/path/to/fc_iostat.sh"
 # </Plugin>
 #
 */
