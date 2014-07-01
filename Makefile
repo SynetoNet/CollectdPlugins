@@ -7,7 +7,7 @@ PARBUILD=-j 5
 .PHONY: all install unit-test ui-test doc clean distclean
 
 # This GNU Make function is used to optimize nightly build by not recompiling and re-installing software if build instructions have not changed.
-ALL_DEPS=Makefile iostat_illumos.rb zfs_iostat.d zfs_iostat.sh fc_iostat.d fc_iostat.sh
+ALL_DEPS=Makefile iostat_illumos.rb zfs_iostat.d zfs_iostat.sh fc_iostat.d fc_iostat.sh zil_iostat.d zil_iostat.sh
 md5_make=@md5sum $(ALL_DEPS) > $(1).build-new; if diff $(1).build-new $(1).build >/dev/null 2>&1; then rm -f $(1).build-new; else $(MAKE) $(1); mv $(1).build-new $(1).build; fi
 
 all:
