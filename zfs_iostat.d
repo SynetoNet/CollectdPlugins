@@ -37,10 +37,35 @@ dmu_buf_hold_array_by_dnode:entry
 {
         this->ds = stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_myname);
         this->parent = (args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent != NULL) ? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_myname) : "";
-        this->path = (this->parent != "") ? strjoin(strjoin(this->parent,"_"), this->ds) : this->ds;
-        this->poolname = stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_pool->dp_root_dir->dd_myname);
-        this->full_path = strjoin(strjoin(this->poolname, "_"), this->path);
-        this->collectd_path = strjoin($$1, strjoin("/zfs_iostat-",this->full_path));
+        this->parent2 = (this->parent != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent != NULL)
+        	? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_myname) : "";
+        this->parent3 = (this->parent2 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent != NULL)
+        	? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+        this->parent4 = (this->parent3 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->parent5 = (this->parent4 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->parent6 = (this->parent5 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+        	? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+        this->parent7 = (this->parent6 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+            ? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->parent8 = (this->parent7 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->parent9 = (this->parent8 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+        	? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+        this->parent10 = (this->parent9 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+            ? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->path = (this->parent != "") ? strjoin(strjoin(this->parent,"#"), this->ds) : this->ds;
+		this->path = (this->parent2 != "") ? strjoin(strjoin(this->parent2,"#"), this->path) : this->path;
+        this->path = (this->parent3 != "") ? strjoin(strjoin(this->parent3,"#"), this->path) : this->path;
+        this->path = (this->parent4 != "") ? strjoin(strjoin(this->parent4,"#"), this->path) : this->path;
+        this->path = (this->parent5 != "") ? strjoin(strjoin(this->parent5,"#"), this->path) : this->path;
+        this->path = (this->parent6 != "") ? strjoin(strjoin(this->parent6,"#"), this->path) : this->path;
+        this->path = (this->parent7 != "") ? strjoin(strjoin(this->parent7,"#"), this->path) : this->path;
+        this->path = (this->parent8 != "") ? strjoin(strjoin(this->parent8,"#"), this->path) : this->path;
+        this->path = (this->parent9 != "") ? strjoin(strjoin(this->parent9,"#"), this->path) : this->path;
+        this->path = (this->parent10 != "") ? strjoin(strjoin(this->parent10,"#"), this->path) : this->path;
+        this->collectd_path = strjoin($$1, strjoin("/zfs_iostat-",this->path));
 
         @ior[this->collectd_path] = count();
         @tpr[this->collectd_path] = sum(args[2]);
@@ -51,11 +76,36 @@ dmu_buf_hold_array_by_dnode:entry
 /args[0]->dn_objset->os_dsl_dataset && !args[3]/ /* Writes */
 {
         this->ds = stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_myname);
-        this->parent = (args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent != NULL) ? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_myname) : "";
-        this->path = (this->parent != "") ? strjoin(strjoin(this->parent,"_"), this->ds) : this->ds;
-        this->poolname = stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_pool->dp_root_dir->dd_myname);
-        this->full_path = strjoin(strjoin(this->poolname, "_"), this->path);
-        this->collectd_path = strjoin($$1, strjoin("/zfs_iostat-",this->full_path));
+		this->parent = (args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent != NULL) ? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_myname) : "";
+		this->parent2 = (this->parent != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_myname) : "";
+		this->parent3 = (this->parent2 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->parent4 = (this->parent3 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->parent5 = (this->parent4 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->parent6 = (this->parent5 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->parent7 = (this->parent6 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->parent8 = (this->parent7 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->parent9 = (this->parent8 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->parent10 = (this->parent9 != "" && args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent != NULL)
+			? stringof(args[0]->dn_objset->os_dsl_dataset->ds_dir->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_parent->dd_myname) : "";
+		this->path = (this->parent != "") ? strjoin(strjoin(this->parent,"#"), this->ds) : this->ds;
+		this->path = (this->parent2 != "") ? strjoin(strjoin(this->parent2,"#"), this->path) : this->path;
+		this->path = (this->parent3 != "") ? strjoin(strjoin(this->parent3,"#"), this->path) : this->path;
+		this->path = (this->parent4 != "") ? strjoin(strjoin(this->parent4,"#"), this->path) : this->path;
+		this->path = (this->parent5 != "") ? strjoin(strjoin(this->parent5,"#"), this->path) : this->path;
+		this->path = (this->parent6 != "") ? strjoin(strjoin(this->parent6,"#"), this->path) : this->path;
+		this->path = (this->parent7 != "") ? strjoin(strjoin(this->parent7,"#"), this->path) : this->path;
+		this->path = (this->parent8 != "") ? strjoin(strjoin(this->parent8,"#"), this->path) : this->path;
+		this->path = (this->parent9 != "") ? strjoin(strjoin(this->parent9,"#"), this->path) : this->path;
+		this->path = (this->parent10 != "") ? strjoin(strjoin(this->parent10,"#"), this->path) : this->path;
+		this->collectd_path = strjoin($$1, strjoin("/zfs_iostat-",this->path));
 
         @iow[this->collectd_path] = count();
         @tpw[this->collectd_path] = sum(args[2]);
