@@ -38,6 +38,11 @@ def sendToCollectd(device,type,metric,value)
     puts "PUTVAL " + HOSTNAME.chomp + "/iostat-" + type + "-" + device + "/gauge-" + metric + " interval=" + INTERVAL.to_s + " N:" + value.to_s
 end
 
+def validValue(value)
+	return true if value.to_i >= 0 and value.to_i < VALUE_THRESHOLD
+    return false
+end
+
 def getPools
     zpoolListProcess = IO.popen("zpool list -H -o name")
     pools = zpoolListProcess.readlines
@@ -47,6 +52,7 @@ end
 
 HOSTNAME = ENV['COLLECTD_HOSTNAME'] ? ENV['COLLECTD_HOSTNAME'] : `hostname`.gsub(/\./, "_")
 INTERVAL = ENV['COLLECTD_INTERVAL'] ? ENV['COLLECTD_INTERVAL'].to_i : 10
+VALUE_THRESHOLD = 7200000
 
 while true
     pools = getPools
@@ -56,17 +62,18 @@ while true
             #puts "Debug: Skipped line:" + line
         else
             iops_read, iops_write, kb_read, kb_write, wait, actv, wsvc_t, asvc_t, perc_wait, perc_busy, device = line.split
+            next if device.nil?
             type = pools.include?(device + "\n") ? "pool" : "disk"
-            sendToCollectd device, type, "iops_read-rs", iops_read
-            sendToCollectd device, type, "iops_write-ws", iops_write
+            sendToCollectd device, type, "iops_read-rs", iops_read if validValue iops_read
+            sendToCollectd device, type, "iops_write-ws", iops_write if validValue iops_write
             sendToCollectd device, type, "bandwidth_read-krs", kb_read.to_i*1024
             sendToCollectd device, type, "bandwidth_write-kws", kb_write.to_i*1024
-            sendToCollectd device, type, "wait_transactions-wait", wait
-            sendToCollectd device, type, "active_transactions-actv", actv
-            sendToCollectd device, type, "wait_avg_service_time-wsvc_t", wsvc_t
-            sendToCollectd device, type, "active_avg_service_time-asvc_t", asvc_t
-            sendToCollectd device, type, "wait_percent-w", perc_wait
-            sendToCollectd device, type, "active_percent-b", perc_busy
+            sendToCollectd device, type, "wait_transactions-wait", wait if validValue wait
+            sendToCollectd device, type, "active_transactions-actv", actv if validValue actv
+            sendToCollectd device, type, "wait_avg_service_time-wsvc_t", wsvc_t if validValue wsvc_t
+            sendToCollectd device, type, "active_avg_service_time-asvc_t", asvc_t if validValue asvc_t
+            sendToCollectd device, type, "wait_percent-w", perc_wait if validValue perc_wait
+            sendToCollectd device, type, "active_percent-b", perc_busy if validValue perc_busy
         end
     end
     @iostatProcess.close
